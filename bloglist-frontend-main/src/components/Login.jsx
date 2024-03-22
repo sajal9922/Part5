@@ -9,10 +9,10 @@ const Login = ({
 }) => {
   return (
     <div>
-      <h2>log in to application</h2>
+      <h2>Log in to application</h2>
       <form onSubmit={handleLoginSubmit}>
         <div>
-          username
+          Username
           <input
             type="text"
             value={username}
@@ -21,7 +21,7 @@ const Login = ({
           />
         </div>
         <div>
-          password
+          Password
           <input
             type="password"
             value={password}
