@@ -5,6 +5,7 @@ import axios from 'axios';
 import Login from './components/login';
 import loginService from './services/login';
 import Notification from './components/Notification';
+import Logout from './components/Logout';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -40,6 +41,12 @@ const App = () => {
       }, 5000);
     }
   };
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogAppUser');
+    setUser(null);
+  };
+
+  // ...
 
   return (
     <div>
@@ -58,6 +65,7 @@ const App = () => {
         <div>
           <h2>blogs</h2>
           <p>{user.name} logged-in</p>
+          <Logout handleLogout={handleLogout} />
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}
