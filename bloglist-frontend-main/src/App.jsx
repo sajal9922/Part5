@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
-import axios from 'axios';
 import Login from './components/login';
 import loginService from './services/login';
 import Notification from './components/Notification';
@@ -19,7 +18,28 @@ const App = () => {
   const handlePasswordChange = (event) => setPassword(event.target.value);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    const fetchBlogs = async () => {
+      try {
+        const initialBlogs = await blogService.getAll();
+        setBlogs(initialBlogs);
+      } catch (exception) {
+        setErrorMessage('Error fetching notes');
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser');
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
+    }
   }, []);
 
   const handleLoginSubmit = async (event) => {
@@ -46,8 +66,6 @@ const App = () => {
     setUser(null);
   };
 
-  // ...
-
   return (
     <div>
       <h1>Blog app</h1>
@@ -63,9 +81,9 @@ const App = () => {
       )}
       {user && (
         <div>
-          <h2>blogs</h2>
           <p>{user.name} logged-in</p>
           <Logout handleLogout={handleLogout} />
+          <h2>Blogs</h2>
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}
