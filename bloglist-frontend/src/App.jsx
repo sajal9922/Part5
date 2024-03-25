@@ -44,6 +44,22 @@ const App = () => {
     }
   }, []);
 
+  const handleDeleteBlog = async (id) => {
+    try {
+      await blogService.deleteBlog(id);
+      setBlogs(blogs.filter((blog) => blog.id !== id));
+      setSuccessMessage('Blog deleted');
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
+    } catch (exception) {
+      setErrorMessage('Error deleting blog');
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
   const handleBlogSubmit = async (e, newBlog) => {
     e.preventDefault();
     try {
@@ -113,7 +129,10 @@ const App = () => {
           <CreateBlog handleBlogSubmit={handleBlogSubmit} />
           <h2>Blogs</h2>
           {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
+            <div key={blog.id}>
+              <Blog blog={blog} />
+              <button onClick={() => handleDeleteBlog(blog.id)}>Delete</button>
+            </div>
           ))}
         </div>
       )}
