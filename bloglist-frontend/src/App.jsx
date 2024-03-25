@@ -14,9 +14,6 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [url, setUrl] = useState('');
 
   const handleUsernameChange = (event) => setUsername(event.target.value);
 
@@ -47,10 +44,9 @@ const App = () => {
     }
   }, []);
 
-  const handleBlogSubmit = async (event) => {
-    event.preventDefault();
+  const handleBlogSubmit = async (e, newBlog) => {
+    e.preventDefault();
     try {
-      const newBlog = { title, author, url };
       const response = await blogService.create(newBlog);
       setBlogs(blogs.concat(response));
       setTitle('');
@@ -114,15 +110,7 @@ const App = () => {
         <div>
           <p>{user.name} logged-in</p>
           <Logout handleLogout={handleLogout} />
-          <CreateBlog
-            handleBlogSubmit={handleBlogSubmit}
-            title={title}
-            setTitle={setTitle}
-            author={author}
-            setAuthor={setAuthor}
-            url={url}
-            setUrl={setUrl}
-          />
+          <CreateBlog handleBlogSubmit={handleBlogSubmit} />
           <h2>Blogs</h2>
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
