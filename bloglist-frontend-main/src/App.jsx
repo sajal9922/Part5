@@ -5,6 +5,7 @@ import Login from './components/login';
 import loginService from './services/login';
 import Notification from './components/Notification';
 import Logout from './components/Logout';
+import CreateBlog from './components/CreateBlog';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -12,6 +13,10 @@ const App = () => {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [url, setUrl] = useState('');
 
   const handleUsernameChange = (event) => setUsername(event.target.value);
 
@@ -42,6 +47,29 @@ const App = () => {
     }
   }, []);
 
+  const handleBlogSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const newBlog = { title, author, url };
+      const response = await blogService.create(newBlog);
+      setBlogs(blogs.concat(response));
+      setTitle('');
+      setAuthor('');
+      setUrl('');
+      setSuccessMessage(
+        `A new blog ${response.title} by ${response.author} added`
+      );
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
+    } catch (exception) {
+      setErrorMessage('Error creating blog');
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
   const handleLoginSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -55,7 +83,7 @@ const App = () => {
       setUsername('');
       setPassword('');
     } catch (exception) {
-      setErrorMessage('Wrong credentials');
+      setErrorMessage('Wrong Username or Password');
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);
@@ -69,7 +97,10 @@ const App = () => {
   return (
     <div>
       <h1>Blog app</h1>
-      <Notification errorMessage={errorMessage} />
+      <Notification
+        errorMessage={errorMessage}
+        successMessage={successMessage}
+      />
       {!user && (
         <Login
           handleLoginSubmit={handleLoginSubmit}
@@ -83,6 +114,15 @@ const App = () => {
         <div>
           <p>{user.name} logged-in</p>
           <Logout handleLogout={handleLogout} />
+          <CreateBlog
+            handleBlogSubmit={handleBlogSubmit}
+            title={title}
+            setTitle={setTitle}
+            author={author}
+            setAuthor={setAuthor}
+            url={url}
+            setUrl={setUrl}
+          />
           <h2>Blogs</h2>
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
