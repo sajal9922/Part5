@@ -44,38 +44,47 @@ const App = () => {
     }
   }, []);
 
-  const handleDeleteBlog = async (id) => {
+  const handleBlogSubmit = async (e, newBlog) => {
+    e.preventDefault();
     try {
-      await blogService.deleteBlog(id);
-      setBlogs(blogs.filter((blog) => blog.id !== id));
-      setSuccessMessage('Blog deleted');
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000);
+      const response = await blogService.create(newBlog);
+      if (response) {
+        setBlogs(blogs.concat(response));
+
+        setSuccessMessage(
+          `A new blog ${response.title} by ${response.author} added`
+        );
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
+      }
     } catch (exception) {
-      setErrorMessage('Error deleting blog');
+      console.log(exception);
+      setErrorMessage('Error creating blog');
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);
     }
   };
 
-  const handleBlogSubmit = async (e, newBlog) => {
-    e.preventDefault();
+  const handleDeleteBlog = async (id) => {
     try {
-      const response = await blogService.create(newBlog);
-      setBlogs(blogs.concat(response));
-      setTitle('');
-      setAuthor('');
-      setUrl('');
-      setSuccessMessage(
-        `A new blog ${response.title} by ${response.author} added`
+      const deletedBlog = blogs.find((blog) => blog.id === id);
+      const confirmed = window.confirm(
+        `Are you sure you want to delete the blog "${deletedBlog.title} By ${deletedBlog.author}"?`
       );
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000);
+      if (confirmed) {
+        await blogService.deleteBlog(id);
+        setBlogs(blogs.filter((blog) => blog.id !== id));
+        setSuccessMessage(
+          `The blog "${deletedBlog.title}" is deleted successfully`
+        );
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
+      }
     } catch (exception) {
-      setErrorMessage('Error creating blog');
+      setErrorMessage('Error deleting blog');
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);
@@ -131,7 +140,11 @@ const App = () => {
           {blogs.map((blog) => (
             <div key={blog.id}>
               <Blog blog={blog} />
-              <button onClick={() => handleDeleteBlog(blog.id)}>Delete</button>
+              {user.username === blog.user.username && (
+                <button onClick={() => handleDeleteBlog(blog.id)}>
+                  Delete
+                </button>
+              )}
             </div>
           ))}
         </div>

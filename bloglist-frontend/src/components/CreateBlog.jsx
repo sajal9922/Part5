@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import propTypes from 'prop-types';
 
 const CreateBlog = ({ handleBlogSubmit }) => {
   const [title, setTitle] = useState('');
@@ -14,7 +15,6 @@ const CreateBlog = ({ handleBlogSubmit }) => {
     e.preventDefault();
     // Handle form submission logic here
     handleBlogSubmit(e, { title, author, url });
-    // Reset form fields
     setTitle('');
     setAuthor('');
     setUrl('');
@@ -63,6 +63,10 @@ const CreateBlog = ({ handleBlogSubmit }) => {
       )}
     </div>
   );
+};
+
+CreateBlog.propTypes = {
+  handleBlogSubmit: propTypes.func.isRequired,
 };
 
 export default CreateBlog;
